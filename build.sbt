@@ -34,7 +34,7 @@ libraryDependencies ++= Seq(
   "org.scala-tools.time" %% "time" % "0.5",
   //"com.github.jsuereth.scala-arm" %% "scala-arm" % "1.1",
   "org.scala-tools" %% "scala-stm" % "0.4",
-  "org.scalaquery" % "scalaquery_2.9.0-1" % "0.9.5",
+  "org.squeryl" %% "squeryl" % "0.9.5-RC1",
   "org.scalatest" %% "scalatest" % "1.6.1" % "test",
   "org.scala-tools.testing" %% "scalacheck" % "1.9" % "test",
   "junit" % "junit" % "4.10" % "test"
