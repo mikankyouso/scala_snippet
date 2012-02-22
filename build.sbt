@@ -43,3 +43,7 @@ libraryDependencies ++= Seq(
 //artifactName := { (config: String, module: ModuleID, artifact: Artifact) =>
 //  artifact.name + "-" + module.revision + "." + artifact.extension
 //}
+
+EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE16)
+
+EclipseKeys.withSource := true
