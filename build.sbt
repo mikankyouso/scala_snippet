@@ -8,7 +8,7 @@ version := "0.0"
 
 scalaVersion := "2.9.1"
 
-resolvers ++= Seq("Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/")
+resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
 
 javacOptions ++= Seq(
   "-encoding", "UTF-8",
@@ -29,7 +29,7 @@ scalacOptions ++= Seq(
 libraryDependencies ++= Seq(
   "com.google.guava" % "guava" % "11.0.1",
   "org.scalaz" %% "scalaz-core" % "6.0.3",
-  "se.scalablesolutions.akka" % "akka-actor" % "1.2",
+  "com.typesafe.akka" % "akka-actor" % "2.0",
   "com.github.scala-incubator.io" %% "scala-io-core" % "0.3.0",
   "org.scala-tools.time" %% "time" % "0.5",
   //"com.github.jsuereth.scala-arm" %% "scala-arm" % "1.1",
