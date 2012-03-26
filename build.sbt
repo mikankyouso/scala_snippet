@@ -27,6 +27,9 @@ scalacOptions ++= Seq(
 )
 
 libraryDependencies ++= Seq(
+  "org.apache.lucene" % "lucene-core" % "3.5.0",
+  "org.apache.lucene" % "lucene-analyzers" % "3.5.0",
+  "org.apache.lucene" % "lucene-demo" % "3.5.0",
   "com.google.guava" % "guava" % "11.0.1",
   "org.scalaz" %% "scalaz-core" % "6.0.3",
   "com.typesafe.akka" % "akka-actor" % "2.0",
