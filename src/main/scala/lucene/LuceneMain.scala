@@ -14,6 +14,10 @@ import org.apache.lucene.document.Field
 import org.apache.lucene.search.IndexSearcher
 import org.apache.lucene.index.IndexReader
 import org.apache.lucene.queryParser.QueryParser
+import java.io.StringReader
+import org.apache.lucene.analysis.tokenattributes.OffsetAttribute
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute
+import org.apache.lucene.analysis.tokenattributes.TermAttribute
 
 object LuceneMain {
   def main(args: Array[String]) {
@@ -36,13 +40,25 @@ object LuceneMain {
 
     val searcher = new IndexSearcher(reader)
     val parser = new QueryParser(version, "name", analyzer)
-    val query = parser.parse("va")
+    val query = parser.parse("value")
 
     val topDocs = searcher.search(query, 10)
     println(topDocs.totalHits)
     for (scoreDoc <- topDocs.scoreDocs) {
       println(scoreDoc)
       println(searcher.doc(scoreDoc.doc))
+    }
+
+    import scala.collection.JavaConversions._
+
+    val tokenStream = analyzer.tokenStream("x", new StringReader("abcd"))
+    tokenStream.getAttributeClassesIterator().foreach(println)
+
+    val charTermAttr = tokenStream.getAttribute(classOf[CharTermAttribute])
+    val offsetAttr = tokenStream.getAttribute(classOf[OffsetAttribute])
+
+    while (tokenStream.incrementToken()) {
+      println(charTermAttr, offsetAttr)
     }
 
     writer.close()
