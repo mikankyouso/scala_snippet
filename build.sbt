@@ -32,7 +32,7 @@ libraryDependencies ++= Seq(
   "org.apache.lucene" % "lucene-highlighter" % "3.5.0",
   "org.apache.lucene" % "lucene-queries" % "3.5.0",
   "org.apache.lucene" % "lucene-demo" % "3.5.0",
-  "com.google.guava" % "guava" % "11.0.1",
+  "com.google.guava" % "guava" % "11.0.2",
   "org.scalaz" %% "scalaz-core" % "6.0.3",
   "com.typesafe.akka" % "akka-actor" % "2.0",
   "com.github.scala-incubator.io" %% "scala-io-core" % "0.3.0",
