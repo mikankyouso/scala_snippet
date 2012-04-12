@@ -2,6 +2,8 @@ import AssemblyKeys._
 
 seq(assemblySettings: _*)
 
+seq(Twirl.settings: _*)
+
 name := "scala_snippet"
 
 version := "0.0"
