@@ -18,9 +18,9 @@ javacOptions ++= Seq(
   "-target", "1.6"
 )
 
-autoCompilerPlugins := true
+//autoCompilerPlugins := true
 
-addCompilerPlugin("org.scala-lang.plugins" % "continuations" % "2.9.1")
+//addCompilerPlugin("org.scala-lang.plugins" % "continuations" % "2.9.1")
 
 scalacOptions ++= Seq(
   "-encoding", "UTF-8",
