@@ -3,11 +3,8 @@ package json
 import net.liftweb.json.JsonAST.JString
 import net.liftweb.json.JsonAST.JValue
 import net.liftweb.json.JsonDSL.string2jvalue
-import net.liftweb.json.DefaultFormats
 import net.liftweb.json.Formats
-import net.liftweb.json.Serialization
 import net.liftweb.json.Serializer
-import net.liftweb.json.ShortTypeHints
 import net.liftweb.json.TypeInfo
 import net.liftweb.json.JsonDSL
 
