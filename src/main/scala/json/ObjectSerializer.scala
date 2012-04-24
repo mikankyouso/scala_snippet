@@ -21,6 +21,7 @@ class ObjectSerializer[T: ClassManifest](objs: T*) extends Serializer[T] {
   }
 
   def serialize(implicit format: Formats): PartialFunction[Any, JValue] = {
-    case o: T if obj2str.contains(o) => obj2str(o)
+    case o if SuperType.isInstance(o) && obj2str.contains(o.asInstanceOf[T]) => obj2str(o.asInstanceOf[T])
   }
+
 }

@@ -31,6 +31,6 @@ class EnumerationSerializer[E <: Enumeration: ClassManifest](enum: E)
   }
 
   def serialize(implicit format: Formats): PartialFunction[Any, JValue] = {
-    case i: E#Value => i.toString
+    case o if EnumerationClass.isInstance(o) => o.toString
   }
 }
