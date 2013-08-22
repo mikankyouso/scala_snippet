@@ -1,62 +1,23 @@
-//import AssemblyKeys._
-
-//seq(assemblySettings: _*)
-
-seq(Twirl.settings: _*)
-
 name := "scala_snippet"
 
 version := "0.0"
 
-scalaVersion := "2.9.1"
+scalaVersion := "2.10.2"
 
-resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
+scalacOptions ++= Seq("-encoding", "UTF-8", "-deprecation", "-unchecked", "-feature", "-P:continuations:enable")
 
-javacOptions ++= Seq(
-  "-encoding", "UTF-8",
-  "-source", "1.6",
-  "-target", "1.6"
-)
-
-//autoCompilerPlugins := true
-
-//addCompilerPlugin("org.scala-lang.plugins" % "continuations" % "2.9.2")
-
-scalacOptions ++= Seq(
-  "-encoding", "UTF-8",
-  //"-P:continuations:enable",
-  "-deprecation"
-)
+javacOptions ++= Seq("-encoding", "UTF-8", "-source", "1.7", "-target", "1.7")
 
 libraryDependencies ++= Seq(
-  "org.apache.lucene" % "lucene-core" % "3.6.0",
-  "org.apache.lucene" % "lucene-analyzers" % "3.6.0",
-  "org.apache.lucene" % "lucene-kuromoji" % "3.6.0",
-  "org.apache.lucene" % "lucene-highlighter" % "3.6.0",
-  "org.apache.lucene" % "lucene-queries" % "3.6.0",
-  "org.apache.lucene" % "lucene-demo" % "3.6.0",
-  "com.google.guava" % "guava" % "11.0.2",
-  "org.scalaz" %% "scalaz-core" % "6.0.3",
-  "com.github.scala-incubator.io" %% "scala-io-core" % "0.4.0",
-  "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.0",
-  "com.typesafe.akka" % "akka-actor" % "2.0",
-  //"net.debasishg" %% "sjson" % "0.17",
-  "net.liftweb" %% "lift-json" % "2.4",
-  "org.scala-tools.time" %% "time" % "0.5",
-  "com.github.jsuereth.scala-arm" %% "scala-arm" % "1.1",
-  "org.scala-tools" %% "scala-stm" % "0.5",
-  //"org.squeryl" %% "squeryl" % "0.9.5-RC1",
-  "net.databinder" %% "dispatch-http" % "0.8.8",
-  "net.databinder" %% "dispatch-mime" % "0.8.8",
-  "org.scalatest" %% "scalatest" % "1.6.1" % "test",
-  "org.scala-tools.testing" %% "scalacheck" % "1.9" % "test",
-  "junit" % "junit" % "4.10" % "test"
+  //"org.apache.solr" % "solr-core" % "4.4.0" excludeAll(ExclusionRule(organization = "org.restlet.jee")),
+  "com.google.guava" % "guava" % "14.0.1",
+  "org.specs2" %% "specs2" % "2.1.1" % "test",
+  "org.pegdown" % "pegdown" % "1.4.1" % "test",
+  "junit" % "junit" % "4.11" % "test"
 )
 
-//artifactName := { (config: String, module: ModuleID, artifact: Artifact) =>
-//  artifact.name + "-" + module.revision + "." + artifact.extension
-//}
-
-EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE16)
+EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE17)
 
 EclipseKeys.withSource := true
+
+(testOptions in Test) += Tests.Argument(TestFrameworks.Specs2, "junitxml", "console", "html")

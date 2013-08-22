@@ -1,3 +1,4 @@
+/*
 package json
 
 import net.liftweb.json.JsonAST.JString
@@ -34,3 +35,5 @@ class EnumerationSerializer[E <: Enumeration: ClassManifest](enum: E)
     case o if EnumerationClass.isInstance(o) => o.toString
   }
 }
+
+*/ 

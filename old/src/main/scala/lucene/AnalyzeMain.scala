@@ -1,3 +1,4 @@
+/*
 package lucene
 
 import java.io.StringReader
@@ -48,3 +49,4 @@ object AnalyzeMain {
     println
   }
 }
+*/ 

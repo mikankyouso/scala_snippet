@@ -1,3 +1,4 @@
+/*
 package guava
 
 import com.google.common.cache.Cache
@@ -20,3 +21,4 @@ object CacheMain {
     println(c2.asMap())
   }
 }
+*/ 

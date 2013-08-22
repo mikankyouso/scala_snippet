@@ -1,3 +1,4 @@
+/*
 package json
 
 import java.io.Writer
@@ -43,3 +44,4 @@ trait X extends JsonSupport {
 //  type T = A
 //}
 case class B(name: String, age: Int) extends X
+*/ 

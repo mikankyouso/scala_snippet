@@ -1,3 +1,4 @@
+/*
 package lucene
 
 import java.io.Reader
@@ -123,3 +124,4 @@ object LuceneMain {
     writer.close()
   }
 }
+*/ 

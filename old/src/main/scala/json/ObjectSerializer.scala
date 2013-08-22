@@ -1,3 +1,4 @@
+/*
 package json
 
 import net.liftweb.json.JsonAST.JString
@@ -25,3 +26,4 @@ class ObjectSerializer[T: ClassManifest](objs: T*) extends Serializer[T] {
   }
 
 }
+*/ 
