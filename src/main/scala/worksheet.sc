@@ -1,3 +1,3 @@
 object worksheet {
-  println("Welcome to the Scala worksheet!")      //> Welcome to the Scala worksheet!
+  println((1 to 10).foldRight(1)(_ + _))          //> 56
 }
