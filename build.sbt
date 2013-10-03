@@ -23,7 +23,10 @@ libraryDependencies ++= Seq(
   "ch.qos.logback" % "logback-classic" % "1.0.13",
   "org.specs2" %% "specs2" % "2.1.1" % "test",
   "org.pegdown" % "pegdown" % "1.4.1" % "test",
-  "junit" % "junit" % "4.11" % "test"
+  "junit" % "junit" % "4.11" % "test",
+  "net.sf.barcode4j" % "barcode4j" % "2.1",
+  "net.sourceforge.barbecue" % "barbecue" % "1.5-beta1",
+  "com.github.nscala-time" %% "nscala-time" % "0.6.0"
 )
 
 EclipseKeys.executionEnvironment := Some(EclipseExecutionEnvironment.JavaSE17)

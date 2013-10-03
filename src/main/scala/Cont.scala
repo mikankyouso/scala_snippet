@@ -41,7 +41,7 @@ object Cont {
 
   def distinct(lst: Int*) = {
     def proc(l: List[Int]): Boolean = l match {
-      case Nil     => true
+      case Nil => true
       case x :: xs => (xs.indexOf(x) < 0) && proc(xs)
     }
     proc(lst.toList)
