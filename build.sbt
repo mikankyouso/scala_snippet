@@ -18,7 +18,7 @@ libraryDependencies ++= Seq(
   "net.databinder.dispatch" %% "dispatch-core" % "0.11.0",
   "com.github.scala-incubator.io" %% "scala-io-core" % "0.4.2",
   "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.2",
-  "com.google.guava" % "guava" % "14.0.1",
+  "com.google.guava" % "guava" % "15.0",
   "org.slf4j" % "jcl-over-slf4j" % "1.7.5",
   "ch.qos.logback" % "logback-classic" % "1.0.13",
   "org.specs2" %% "specs2" % "2.1.1" % "test",
