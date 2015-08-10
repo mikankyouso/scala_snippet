@@ -22,6 +22,6 @@ case class Sim(pc: PC, enemy: Enemy, timeLimit: Int) {
 
 object Sim {
   def main(args: Array[String]): Unit = {
-    Sim(PC(Sum), Enemy(), 10000).start
+    Sim(PC(Sum), Enemy(), 30000).start
   }
 }

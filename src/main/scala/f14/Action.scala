@@ -40,14 +40,31 @@ trait Spell extends Action {
 
 case class DDSpell(level: Int, mp: Int, cast: Int, recast: Int, potency: Int, damegeType: DamegeType) extends Spell {
   def use(context: Context): Context = {
-    val pc = context.pc
-    val actionHistory = pc.actionHistory
-    val time = context.elapsedTime
-    coolDownEvent(context).map(context => context.copy(
-      pc =
-        pc.copy(actionHistory = (time, this) :: actionHistory),
-      eventQueue =
-        context.eventQueue.enqueue(time + 1000.max(cast - 500), Damage(potency, damegeType, pc, context.enemy, this))))
+    coolDownEvent(context).map { context =>
+      val pc = context.pc
+      val actionHistory = pc.actionHistory
+      val time = context.elapsedTime
+      context.copy(
+        pc =
+          pc.copy(actionHistory = (time, this) :: actionHistory),
+        eventQueue =
+          context.eventQueue.enqueue(time + 1000.max(cast - 500), Damage(potency, damegeType, pc, context.enemy, this)))
+    }
+  }
+}
+
+case class DoTSpell(level: Int, mp: Int, cast: Int, recast: Int, duration: Int, hitPotency: Int, tickPotency: Int, damegeType: DamegeType) extends Spell {
+  val dot = DoT(tickPotency, damegeType, this)
+  def use(context: Context): Context = {
+    coolDownEvent(context).map { context =>
+      val pc = context.pc
+      val actionHistory = pc.actionHistory
+      val time = context.elapsedTime
+      context.copy(pc = pc.copy(actionHistory = (time, this) :: actionHistory))
+        .enqueue(time + 1000.max(cast - 500), Damage(hitPotency, damegeType, pc, context.enemy, this))
+        .enqueue(time + 1000.max(cast - 500), AddEnchant(context.enemy, dot))
+        .enqueue(time + 1000.max(cast - 500) + duration, DeleteEnchant(context.enemy, dot))
+    }
   }
 }
 
@@ -56,3 +73,4 @@ trait AB extends Action {
 }
 
 object Ruin extends DDSpell(1, 20, 2500, 0, 80, Magic) {}
+object Bio extends DoTSpell(1, 50, 0, 0, 18000, 0, 40, Magic) {}

@@ -1,5 +1,7 @@
 package f14
 
+import scala.util.Random
+
 trait Event {
   def apply(context: Context): Context
 }
@@ -28,13 +30,17 @@ object Tick extends Event {
 object Active extends Event {
   def apply(context: Context): Context = {
     //TODO
-    context.pc.job.actions.find(a => a.usable(context)) match {
-      case Some(action) => {
-        println("%8.2f 【%s】".format(context.elapsedTime / 1000.0, action))
-        action.use(context)
-      }
-      case None => context.enqueue(context.elapsedTime + 10, Active)
-    }
+    //    context.pc.job.actions.find(a => a.usable(context)) match {
+    //      case Some(action) => {
+    //        println("%8.2f 【%s】".format(context.elapsedTime / 1000.0, action))
+    //        action.use(context)
+    //      }
+    //      case None => context.enqueue(context.elapsedTime + 10, Active)
+    //    }
+    val actions = context.pc.job.actions
+    val action = actions.toArray.apply(Random.nextInt(actions.size))
+    println("%8.2f 【%s】".format(context.elapsedTime / 1000.0, action))
+    action.use(context)
   }
 }
 
@@ -60,6 +66,26 @@ case class RecastEnd(action: Action) extends Event {
   def apply(context: Context): Context = {
     context.copy(pc = context.pc.copy(coolDown = context.pc.coolDown - action))
       .enqueue(context.elapsedTime, Active)
+  }
+}
+
+case class AddEnchant(gchar: GChar, enchant: Enchant) extends Event {
+  def apply(context: Context): Context = {
+    //FIXME
+    gchar match {
+      case _: PC    => context.copy(pc = context.pc.copy(enchants = context.pc.enchants + enchant))
+      case _: Enemy => context.copy(enemy = context.enemy.copy(enchants = context.enemy.enchants + enchant))
+    }
+  }
+}
+
+case class DeleteEnchant(gchar: GChar, enchant: Enchant) extends Event {
+  def apply(context: Context): Context = {
+    //FIXME
+    gchar match {
+      case _: PC    => context.copy(pc = context.pc.copy(enchants = context.pc.enchants - enchant))
+      case _: Enemy => context.copy(enemy = context.enemy.copy(enchants = context.enemy.enchants - enchant))
+    }
   }
 }
 

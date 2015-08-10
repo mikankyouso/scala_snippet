@@ -2,4 +2,4 @@ package f14
 
 case class Job(actions: Set[Action])
 
-object Sum extends Job(Set(Ruin))
+object Sum extends Job(Set(Ruin, Bio))
