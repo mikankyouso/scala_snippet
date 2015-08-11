@@ -8,6 +8,6 @@ trait Enchant {
 
 case class DoT(potency: Int, damegeType: DamegeType, action: Action) extends Enchant {
   override def tick(context: Context): Context = {
-    context.enqueue(context.elapsedTime, Damage(potency, damegeType, context.pc, context.enemy, action))
+    context.enqueue(context.elapsedTime, Damage(potency, damegeType, action))
   }
 }
