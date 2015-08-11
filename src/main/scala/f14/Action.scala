@@ -7,19 +7,21 @@ trait Action {
   def mp: Int
   def cast: Int
   def recast: Int
-  def freezeAction: Int = 850 min cast
+  def freezeTime: Int = 850 max cast
 
   def use(context: Context): Context
 
   def usable(context: Context): Boolean = {
-    !(context.coolDown.contains(this) || (gcd && context.globalCoolDown))
+    !(context.freeze || context.coolDown.contains(this) || (gcd && context.globalCoolDown))
   }
 
   protected def useAction(context: Context): Context = {
+    val time = context.elapsedTime
     context
-      .copy(actionHistory = (context.elapsedTime, this) :: context.actionHistory)
-      .ifMap(gcd) { c => c.enqueue(c.elapsedTime, GCDStart).enqueue(c.elapsedTime + 2500, GCDEnd) }
-      .ifMap(recast > 0) { c => c.enqueue(c.elapsedTime, RecastStart(this)).enqueue(c.elapsedTime + recast, RecastEnd(this)) }
+      .copy(freeze = true, actionHistory = (time, this) :: context.actionHistory)
+      .ifMap(gcd) { c => c.copy(globalCoolDown = true).enqueue(time + 2500, GCDEnd) }
+      .ifMap(recast > 0) { c => c.copy(coolDown = context.coolDown + this).enqueue(time + recast, RecastEnd(this)) }
+      .enqueue(time + freezeTime, FreezeEnd)
   }
 
   override def toString(): String = this.getClass.getSimpleName
@@ -67,7 +69,7 @@ object Mosa extends AB {
     override def correct(damege: Damage): (Int, Int) = (20, 0)
   }
   val level = 1
-  val recast = 180000
+  val recast = 1800
   def use(context: Context): Context = {
     val hitTime = context.elapsedTime
     useAction(context)

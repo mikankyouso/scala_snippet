@@ -47,12 +47,6 @@ object Active extends Event {
   }
 }
 
-object GCDStart extends Event {
-  def apply(context: Context): Context = {
-    context.copy(globalCoolDown = true)
-  }
-}
-
 object GCDEnd extends Event {
   def apply(context: Context): Context = {
     context.copy(globalCoolDown = false)
@@ -60,15 +54,16 @@ object GCDEnd extends Event {
   }
 }
 
-case class RecastStart(action: Action) extends Event {
-  def apply(context: Context): Context = {
-    context.copy(coolDown = context.coolDown + action)
-  }
-}
-
 case class RecastEnd(action: Action) extends Event {
   def apply(context: Context): Context = {
     context.copy(coolDown = context.coolDown - action)
+      .enqueue(context.elapsedTime, Active)
+  }
+}
+
+object FreezeEnd extends Event {
+  def apply(context: Context): Context = {
+    context.copy(freeze = false)
       .enqueue(context.elapsedTime, Active)
   }
 }

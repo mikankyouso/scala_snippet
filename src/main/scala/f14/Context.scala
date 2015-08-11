@@ -11,7 +11,8 @@ case class Context(
     actionHistory: List[(Int, Action)] = Nil,
     enchants: Set[Enchant] = Set.empty,
     globalCoolDown: Boolean = false,
-    coolDown: Set[Action] = Set.empty) {
+    coolDown: Set[Action] = Set.empty,
+    freeze: Boolean = false) {
   def enqueue(time: Int, event: Event): Context = copy(eventQueue = eventQueue.enqueue(time, event))
   def cancel(event: Event): Context = copy(eventQueue = eventQueue.filter(_ != event))
 
