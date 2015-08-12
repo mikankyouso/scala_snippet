@@ -6,15 +6,23 @@ import scala.collection.immutable.Queue
 case class Context(
     pc: PC,
     elapsedTime: Int = 0,
-    damege: Int = 0,
+    damage: Int = 0,
     eventQueue: EventQueue = EventQueue(),
     actionHistory: List[(Int, Action)] = Nil,
     enchants: Set[Enchant] = Set.empty,
     globalCoolDown: Boolean = false,
     coolDown: Set[Action] = Set.empty,
     freeze: Boolean = false) {
+
   def enqueue(time: Int, event: Event): Context = copy(eventQueue = eventQueue.enqueue(time, event))
-  def cancel(event: Event): Context = copy(eventQueue = eventQueue.filter(_ != event))
+  def cancelEvent(f: Event => Boolean): Context = copy(eventQueue = eventQueue.filter(!f(_)))
+
+  def addEnchant(enchant: Enchant): Context = {
+    copy(enchants = enchants.filter(e => e.action != enchant.action) + enchant)
+  }
+  def removeEnchant(enchant: Enchant): Context = {
+    copy(enchants = enchants - enchant)
+  }
 
   def map(f: Context => Context): Context = f(this)
   def flatMap(f: Context => Context): Context = f(this)

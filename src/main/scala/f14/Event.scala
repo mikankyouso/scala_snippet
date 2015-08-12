@@ -37,7 +37,7 @@ object Active extends Event {
     //      }
     //      case None => context.enqueue(context.elapsedTime + 10, Active)
     //    }
-    println(context)
+//    println(context)
     val usableActions = context.pc.job.actions.filter(_.usable(context))
     context.ifMap(!usableActions.isEmpty) { context =>
       val action = usableActions.toArray.apply(Random.nextInt(usableActions.size))
@@ -70,26 +70,20 @@ object FreezeEnd extends Event {
 
 case class AddEnchant(enchant: Enchant) extends Event {
   def apply(context: Context): Context = {
-    context.copy(enchants = context.enchants + enchant)
+    context.addEnchant(enchant)
   }
 }
 
 case class DeleteEnchant(enchant: Enchant) extends Event {
   def apply(context: Context): Context = {
-    context.copy(enchants = context.enchants - enchant)
+    context.removeEnchant(enchant)
   }
 }
 
-case class Damage(potency: Int, damegeType: DamegeType, action: Action) extends Event {
+case class Damage(potency: Int, damageType: DamageType, action: Action) extends Event {
   def apply(context: Context): Context = {
-    val (percent, absolute) =
-      context.enchants
-        .map(_.correct(this))
-        .foldLeft((0, 0)) { case ((p1, a1), (p2, a2)) => (p1 + p2, a1 + a2) }
-    val calcDamege = (potency * (1.0 + percent / 100d)).toInt + absolute
-
     context.copy(
-      damege = context.damege + calcDamege,
+      damage = context.damage + potency,
       enchants = context.enchants.filterNot(_.deleteBy(this)))
   }
 }

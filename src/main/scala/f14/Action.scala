@@ -24,6 +24,14 @@ trait Action {
       .enqueue(time + freezeTime, FreezeEnd)
   }
 
+  protected def damage(potency: Int, damageType: DamageType, context: Context): Damage = {
+    val (percent, absolute) =
+      context.enchants
+        .map(_.correctDamage(damageType, this))
+        .foldLeft((0, 0)) { case ((p1, a1), (p2, a2)) => (p1 + p2, a1 + a2) }
+    Damage((potency * (1.0 + percent / 100d)).toInt + absolute, damageType, this)
+  }
+
   override def toString(): String = this.getClass.getSimpleName
 }
 
@@ -36,46 +44,64 @@ trait Spell extends Action {
   val tp = 0
 }
 
-trait AB extends Action {
+trait Ability extends Action {
   val gcd = false
   val tp = 0
   val mp = 0
   val cast = 0
 }
 
-case class DDSpell(level: Int, mp: Int, cast: Int, recast: Int, potency: Int, damegeType: DamegeType) extends Spell {
+case class DDSpell(level: Int, mp: Int, cast: Int, recast: Int, potency: Int, damageType: DamageType) extends Spell {
   def use(context: Context): Context = {
-    useAction(context).enqueue(context.elapsedTime + 1000.max(cast - 500), Damage(potency, damegeType, this))
+    val hitTime = context.elapsedTime + 1000.max(cast - 500)
+    useAction(context).enqueue(hitTime, damage(potency, damageType, context))
   }
 }
 
-case class DoTSpell(level: Int, mp: Int, cast: Int, recast: Int, duration: Int, hitPotency: Int, tickPotency: Int, damegeType: DamegeType) extends Spell {
-  val dot = DoT(tickPotency, damegeType, this)
+case class DoTSpell(level: Int, mp: Int, cast: Int, recast: Int, duration: Int, hitPotency: Int, tickPotency: Int, damageType: DamageType) extends Spell {
   def use(context: Context): Context = {
+    val dot = DoT(damage(tickPotency, damageType, context), this)
     val hitTime = context.elapsedTime + 1000.max(cast - 500)
     useAction(context)
-      .ifMap(hitPotency > 0) { _.enqueue(hitTime, Damage(hitPotency, damegeType, this)) }
-      .cancel(DeleteEnchant(dot))
+      .ifMap(hitPotency > 0) {
+        _.enqueue(hitTime, damage(hitPotency, damageType, context))
+      }
+      .cancelEvent {
+        case DeleteEnchant(DoT(_, action)) if action == this => true
+        case _ => false
+      }
       .enqueue(hitTime, AddEnchant(dot))
       .enqueue(hitTime + duration, DeleteEnchant(dot))
   }
 }
 
-object Ruin extends DDSpell(1, 20, 2500, 0, 80, Magic) {}
-object Ruin2 extends DDSpell(1, 40, 0, 0, 80, Magic) {}
-object Bio extends DoTSpell(1, 50, 0, 0, 18000, 0, 40, Magic) {}
-object Mosa extends AB {
-  object buff extends Enchant {
-    override def correct(damege: Damage): (Int, Int) = (20, 0)
-  }
-  val level = 1
-  val recast = 1800
+object Ruin extends DDSpell(1, 20, 2500, 0, 80000, Magic)
+object Ruin2 extends DDSpell(1, 40, 0, 0, 80000, Magic)
+object Bio extends DoTSpell(1, 50, 0, 0, 18000, 0, 40000, Magic)
+object Miasma extends DoTSpell(1, 50, 2500, 0, 24000, 20000, 35000, Magic)
+
+abstract case class Buff(level: Int, recast: Int, duration: Int) extends Ability {
+  def enchant: Enchant
   def use(context: Context): Context = {
     val hitTime = context.elapsedTime
     useAction(context)
-      .cancel(DeleteEnchant(buff))
-      .enqueue(hitTime, AddEnchant(buff))
-      .enqueue(hitTime + 200000, DeleteEnchant(buff))
+      .cancelEvent {
+        case DeleteEnchant(enchant) => true
+        case _                      => false
+      }
+      .enqueue(hitTime, AddEnchant(enchant))
+      .enqueue(hitTime + duration, DeleteEnchant(enchant))
   }
 }
 
+//object Mosa extends Buff(1, 180000, 20000, new Enchant {
+//  def action = Mosa
+//  override def correctDamage(damageType: DamageType, action: Action): (Int, Int) = (20, 0)
+//})
+
+object Mosa extends Buff(1, 180000, 20000) {
+  val enchant = new Enchant {
+    val action = Mosa
+    override def correctDamage(damageType: DamageType, action: Action): (Int, Int) = (20, 0)
+  }
+}
