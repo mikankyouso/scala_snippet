@@ -2,9 +2,11 @@ package f14
 
 import scala.collection.SortedMap
 import scala.collection.immutable.Queue
+import scala.annotation.tailrec
 
 case class Context(
     pc: PC,
+    actionSelector: ActionSelector,
     elapsedTime: Int = 0,
     damage: Int = 0,
     eventQueue: EventQueue = EventQueue(),
@@ -27,6 +29,21 @@ case class Context(
   def map(f: Context => Context): Context = f(this)
   def flatMap(f: Context => Context): Context = f(this)
   def ifMap(b: Boolean)(f: Context => Context): Context = if (b) f(this) else this
+
+  @tailrec
+  final def forward: Context = {
+    val (time, event, queue) = eventQueue.dequeue
+    val nextContext = copy(elapsedTime = time, eventQueue = queue)
+    //println("%8.2f %10.2f %s".format(time / 1000.0, damage / 1000.0, event))
+    event match {
+      case End => nextContext
+      case _   => event.apply(nextContext).forward
+    }
+  }
+}
+
+trait ActionSelector {
+  def select(context: Context, usableActions: Set[Action]): (Option[Action], ActionSelector)
 }
 
 case class EventQueue(map: SortedMap[Int, Queue[Event]] = SortedMap.empty) {

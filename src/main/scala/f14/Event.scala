@@ -37,12 +37,18 @@ object Active extends Event {
     //      }
     //      case None => context.enqueue(context.elapsedTime + 10, Active)
     //    }
-//    println(context)
+    //    println(context)
     val usableActions = context.pc.job.actions.filter(_.usable(context))
     context.ifMap(!usableActions.isEmpty) { context =>
-      val action = usableActions.toArray.apply(Random.nextInt(usableActions.size))
-      println("%8.2f 【%s】".format(context.elapsedTime / 1000.0, action))
-      action.use(context)
+      val (optAction, selector) = context.actionSelector.select(context, usableActions)
+      //optAction.foreach(a => println("%8.2f 【%s】".format(context.elapsedTime / 1000.0, a)))
+      optAction
+        .map(_.use(context))
+        .getOrElse(context)
+        .copy(actionSelector = selector)
+      //      val action = usableActions.toArray.apply(Random.nextInt(usableActions.size))
+      //      println("%8.2f 【%s】".format(context.elapsedTime / 1000.0, action))
+      //      action.use(context)
     }
   }
 }
