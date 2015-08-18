@@ -18,9 +18,10 @@ trait Action {
   protected def useAction(context: Context): Context = {
     val time = context.elapsedTime
     context
-      .copy(freeze = true, actionHistory = (time, this) :: context.actionHistory)
-      .ifMap(gcd) { c => c.copy(globalCoolDown = true).enqueue(time + 2500, GCDEnd) }
-      .ifMap(recast > 0) { c => c.copy(coolDown = context.coolDown + this).enqueue(time + recast, RecastEnd(this)) }
+      .freeze(true)
+      .addHistory(time, this)
+      .ifMap(gcd) { c => c.globalCoolDown(true).enqueue(time + 2500, GCDEnd) }
+      .ifMap(recast > 0) { c => c.addCoolDown(this).enqueue(time + recast, RecastEnd(this)) }
       .enqueue(time + freezeTime, FreezeEnd)
   }
 

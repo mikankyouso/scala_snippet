@@ -45,7 +45,7 @@ object Active extends Event {
       optAction
         .map(_.use(context))
         .getOrElse(context)
-        .copy(actionSelector = selector)
+        .actionSelector(selector)
       //      val action = usableActions.toArray.apply(Random.nextInt(usableActions.size))
       //      println("%8.2f 【%s】".format(context.elapsedTime / 1000.0, action))
       //      action.use(context)
@@ -55,21 +55,21 @@ object Active extends Event {
 
 object GCDEnd extends Event {
   def apply(context: Context): Context = {
-    context.copy(globalCoolDown = false)
+    context.globalCoolDown(false)
       .enqueue(context.elapsedTime, Active)
   }
 }
 
 case class RecastEnd(action: Action) extends Event {
   def apply(context: Context): Context = {
-    context.copy(coolDown = context.coolDown - action)
+    context.removeCoolDown(action)
       .enqueue(context.elapsedTime, Active)
   }
 }
 
 object FreezeEnd extends Event {
   def apply(context: Context): Context = {
-    context.copy(freeze = false)
+    context.freeze(false)
       .enqueue(context.elapsedTime, Active)
   }
 }
@@ -88,8 +88,8 @@ case class DeleteEnchant(enchant: Enchant) extends Event {
 
 case class Damage(potency: Int, damageType: DamageType, action: Action) extends Event {
   def apply(context: Context): Context = {
-    context.copy(
-      damage = context.damage + potency,
-      enchants = context.enchants.filterNot(_.deleteBy(this)))
+    context
+      .damage(context.damage + potency)
+      .removeEnchant(_.deleteBy(this))
   }
 }

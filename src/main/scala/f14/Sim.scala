@@ -2,10 +2,12 @@ package f14
 
 import scala.annotation.tailrec
 import scala.util.Random
+import scala.collection._
 
 case class Sim(pc: PC, timeLimit: Int, actionSelector: ActionSelector) {
   def start: Context = {
-    val context = Context(pc, actionSelector)
+    val context = ImmutableContext(pc, actionSelector)
+    //val context = MutableContext(pc, actionSelector)
     context.enqueue(0, Start).enqueue(0, Active).enqueue(timeLimit, End).forward
   }
 }
@@ -19,6 +21,7 @@ object Sim {
     val as = MaxDamageFinder
     val ret = Sim(PC(Sum), 30000, as).start
     println(ret.damage / 1000, ret.actionHistory.reverse)
+    //println(ret)
     println(System.currentTimeMillis() - s + "ms")
   }
 }
@@ -47,8 +50,14 @@ case class FixedActionSelector(actions: Action*) extends ActionSelector {
 object MaxDamageFinder extends ActionSelector {
   def select(context: Context, usableActions: Set[Action]): (Option[Action], ActionSelector) = {
     val (_, action) = usableActions
-      .par
-      .map(a => (a.use(context).forward.damage, a))
+      //.par
+      .map { act =>
+        val c = context match {
+          case mc: MutableContext => mc.copy(eventQueue = mc.eventQueue.clone())
+          case _                  => context
+        }
+        (act.use(c).forward.damage, act)
+      }
       .maxBy(_._1)
     (Some(action), this)
   }
