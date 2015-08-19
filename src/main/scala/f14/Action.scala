@@ -30,7 +30,7 @@ trait Action {
       context.enchants
         .map(_.correctDamage(damageType, this))
         .foldLeft((0, 0)) { case ((p1, a1), (p2, a2)) => (p1 + p2, a1 + a2) }
-    Damage((potency * (1.0 + percent / 100d)).toInt + absolute, damageType, this)
+    Damage(((potency + absolute) * (1.0 + percent / 100d)).toInt, damageType, this)
   }
 
   override def toString(): String = this.getClass.getSimpleName
@@ -82,8 +82,9 @@ object Bio extends DoTSpell(1, 50, 0, 0, 18000, 0, 40000, Magic)
 object Miasma extends DoTSpell(1, 50, 2500, 0, 24000, 20000, 35000, Magic)
 object Bio2 extends DoTSpell(1, 50, 2500, 0, 30000, 0, 35000, Magic)
 
-abstract case class Buff(level: Int, recast: Int, duration: Int) extends Ability {
+trait Buff extends Ability {
   def enchant: Enchant
+  def duration: Int
   def use(context: Context): Context = {
     val hitTime = context.elapsedTime
     useAction(context)
@@ -101,9 +102,45 @@ abstract case class Buff(level: Int, recast: Int, duration: Int) extends Ability
 //  override def correctDamage(damageType: DamageType, action: Action): (Int, Int) = (20, 0)
 //})
 
-object Mosa extends Buff(1, 180000, 20000) {
+object Mosa extends Buff {
+  val level = 1
+  val recast = 180000
+  val duration = 20000
   val enchant = new Enchant {
     val action = Mosa
     override def correctDamage(damageType: DamageType, action: Action): (Int, Int) = (20, 0)
+  }
+}
+
+object Flow extends Ability {
+  val level = 1
+  val recast = 60000
+
+  case class FlowEnchant(count: Int = 3) extends Enchant { val action = Flow }
+
+  def use(context: Context): Context = {
+    useAction(context)
+      .enqueue(context.elapsedTime, AddEnchant(FlowEnchant(3)))
+  }
+}
+
+object Burst extends Ability {
+  val level = 1
+  val recast = 60000
+
+  override def usable(context: Context): Boolean = {
+    super.usable(context) && context.enchants.exists(_.action == Flow)
+  }
+
+  def use(context: Context): Context = {
+    val flow = context.enchants.find(_.action == Flow).get.asInstanceOf[Flow.FlowEnchant]
+    val dots = context.enchants.count { e =>
+      val act = e.action
+      act == Bio || act == Miasma || act == Bio2
+    }
+    useAction(context)
+      .enqueue(context.elapsedTime + 1000, damage(dots * 100000, Magic, context))
+      .enqueue(context.elapsedTime, DeleteEnchant(flow))
+      .ifMap(flow.count >= 2) { _.enqueue(context.elapsedTime, AddEnchant(flow.copy(count = flow.count - 1))) }
   }
 }

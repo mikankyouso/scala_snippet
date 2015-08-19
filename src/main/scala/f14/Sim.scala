@@ -16,9 +16,9 @@ object Sim {
     val s = System.currentTimeMillis()
     //val as = NopActionSelector
     //val as = RandomActionSelector
-    //val as = FixedActionSelector(Bio, Ruin2, Mosa, Miasma)
+    //    val as = FixedActionSelector(Flow, Mosa, Bio, Miasma, Burst, Ruin2, Ruin2, Ruin2, Ruin2, Ruin2, Ruin2, Ruin2)
     val as = MaxDamageFinder
-    val ret = Sim(PC(Sum), 10000, as).start
+    val ret = Sim(PC(Sum), 15000, as).start
     println(ret.damage / 1000, ret.actionHistory.reverse)
     //println(ret)
     println(System.currentTimeMillis() - s + "ms")
@@ -48,15 +48,18 @@ case class FixedActionSelector(actions: Action*) extends ActionSelector {
 
 object MaxDamageFinder extends ActionSelector {
   def select(context: Context, usableActions: Set[Action]): (Option[Action], ActionSelector) = {
-    val (_, action) = usableActions
-      //.par
+    val set = usableActions
+      .par
       .map { act =>
-        val c = act.use(context).forward
-        println(c.damage, act)
-        (c.damage, act)
+        (act, act.use(context).forward)
       }
-      .maxBy(_._1)
-    (Some(action), this)
+      .filter{ case (_, c) => c.elapsedTime < 10000 || c.damage / c.elapsedTime > 69}
+    if (set.isEmpty) {
+      (None, NopActionSelector)
+    } else {
+      val (act, _) = set.maxBy(_._2.damage)
+      (Some(act), this)
+    }
   }
 }
 
