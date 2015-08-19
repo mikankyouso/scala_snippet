@@ -77,7 +77,7 @@ case class DoTSpell(level: Int, mp: Int, cast: Int, recast: Int, duration: Int, 
 }
 
 object Ruin extends DDSpell(1, 20, 2500, 0, 80000, Magic)
-object Ruin2 extends DDSpell(1, 40, 0, 0, 80000, Magic)
+object Ruin2 extends DDSpell(1, 40, 0, 0, 80001, Magic)
 object Bio extends DoTSpell(1, 50, 0, 0, 18000, 0, 40000, Magic)
 object Miasma extends DoTSpell(1, 50, 2500, 0, 24000, 20000, 35000, Magic)
 object Bio2 extends DoTSpell(1, 50, 2500, 0, 30000, 0, 35000, Magic)

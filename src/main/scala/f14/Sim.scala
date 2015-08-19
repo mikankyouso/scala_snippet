@@ -6,8 +6,14 @@ import scala.util.Random
 case class Sim(pc: PC, timeLimit: Int, actionSelector: ActionSelector) {
   def start: Context = {
     val context = Context(pc, actionSelector)
+
     //val context = MutableContext(pc, actionSelector)
-    context.enqueue(0, Start).enqueue(0, Active).enqueue(timeLimit, End).forward
+    context
+      .addEnchant(Flow.FlowEnchant())
+      .enqueue(0, Start)
+      .enqueue(0, Active)
+      .enqueue(timeLimit, End)
+      .forward
   }
 }
 
@@ -18,7 +24,7 @@ object Sim {
     //val as = RandomActionSelector
     //    val as = FixedActionSelector(Flow, Mosa, Bio, Miasma, Burst, Ruin2, Ruin2, Ruin2, Ruin2, Ruin2, Ruin2, Ruin2)
     val as = MaxDamageFinder
-    val ret = Sim(PC(Sum), 15000, as).start
+    val ret = Sim(PC(Sum), 10000, as).start
     println(ret.damage / 1000, ret.actionHistory.reverse)
     //println(ret)
     println(System.currentTimeMillis() - s + "ms")
@@ -51,14 +57,15 @@ object MaxDamageFinder extends ActionSelector {
     val set = usableActions
       .par
       .map { act =>
-        (act, act.use(context).forward)
+        (Option(act), act.use(context).forward)
       }
-      .filter{ case (_, c) => c.elapsedTime < 10000 || c.damage / c.elapsedTime > 69}
+      //.+((None, context.forward))
+      .filter { case (_, c) => c.elapsedTime < 10000 || c.damage / c.elapsedTime > 69 }
     if (set.isEmpty) {
       (None, NopActionSelector)
     } else {
       val (act, _) = set.maxBy(_._2.damage)
-      (Some(act), this)
+      (act, this)
     }
   }
 }
