@@ -144,3 +144,22 @@ object Burst extends Ability {
       .ifMap(flow.count >= 2) { _.enqueue(context.elapsedTime, AddEnchant(flow.copy(count = flow.count - 1))) }
   }
 }
+
+object PainFlare extends Ability {
+  val level = 1
+  val recast = 10000
+
+  override def usable(context: Context): Boolean = {
+    super.usable(context) && context.enchants.exists(_.action == Flow)
+  }
+
+  def use(context: Context): Context = {
+    val flow = context.enchants.find(_.action == Flow).get.asInstanceOf[Flow.FlowEnchant]
+    useAction(context)
+      .enqueue(context.elapsedTime + 1000, damage(200000, Magic, context))
+      .enqueue(context.elapsedTime, DeleteEnchant(flow))
+      .ifMap(flow.count >= 2) { _.enqueue(context.elapsedTime, AddEnchant(flow.copy(count = flow.count - 1))) }
+  }
+}
+
+
