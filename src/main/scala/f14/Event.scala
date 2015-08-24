@@ -29,26 +29,18 @@ object Tick extends Event {
 
 object Active extends Event {
   def apply(context: Context): Context = {
-    //TODO
-    //    context.pc.job.actions.find(a => a.usable(context)) match {
-    //      case Some(action) => {
-    //        println("%8.2f 【%s】".format(context.elapsedTime / 1000.0, action))
-    //        action.use(context)
-    //      }
-    //      case None => context.enqueue(context.elapsedTime + 10, Active)
-    //    }
-    //    println(context)
-    val usableActions = context.pc.job.actions.filter(_.usable(context))
-    context.ifMap(!usableActions.isEmpty) { context =>
-      val (optAction, selector) = context.actionSelector.select(context, usableActions)
-      //optAction.foreach(a => println("%8.2f 【%s】".format(context.elapsedTime / 1000.0, a)))
-      optAction
-        .map(_.use(context))
-        .getOrElse(context)
-        .actionSelector(selector)
-      //      val action = usableActions.toArray.apply(Random.nextInt(usableActions.size))
-      //      println("%8.2f 【%s】".format(context.elapsedTime / 1000.0, action))
-      //      action.use(context)
+    if (context.freeze) {
+      context
+    } else {
+      val usableActions = context.pc.job.actions.filter(_.usable(context))
+      context.ifMap(!usableActions.isEmpty) { context =>
+        val (optAction, selector) = context.actionSelector.select(context, usableActions)
+        //optAction.foreach(a => println("%8.2f 【%s】".format(context.elapsedTime / 1000.0, a)))
+        optAction
+          .map(_.use(context))
+          .getOrElse(context)
+          .actionSelector(selector)
+      }
     }
   }
 }
@@ -77,12 +69,14 @@ object FreezeEnd extends Event {
 case class AddEnchant(enchant: Enchant) extends Event {
   def apply(context: Context): Context = {
     context.addEnchant(enchant)
+      .enqueue(context.elapsedTime, Active)
   }
 }
 
 case class DeleteEnchant(enchant: Enchant) extends Event {
   def apply(context: Context): Context = {
     context.removeEnchant(enchant)
+      .enqueue(context.elapsedTime, Active)
   }
 }
 
