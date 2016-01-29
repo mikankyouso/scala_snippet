@@ -3,11 +3,11 @@ package f14
 import scala.util.Random
 
 object GA {
-  val time = 120000
+  val time = 180000
   val pc = PC(Sum)
 
-  val population = 100
-  val genLimit = 10000
+  val population = 300
+  val genLimit = 100000
 
   def main(args: Array[String]): Unit = {
     val s = System.currentTimeMillis()
@@ -16,7 +16,8 @@ object GA {
     val init = new Initialization {
       def apply(): Seq[Seq[Action]] =
         (1 to population).map { _ =>
-          (1 to time / 2500 * 3).map { _ => jobActions(Random.nextInt(jobActions.size)) }
+          //(1 to time / 2500 * 3).map { _ => jobActions(Random.nextInt(jobActions.size)) }
+          (1 to time / 2500 * 2).map { _ => jobActions(Random.nextInt(jobActions.size)) }
         }
     }
 
@@ -51,12 +52,25 @@ object GA {
     }
 
     val mutate = new Mutation {
+      def swap(acts: Seq[Action], i1: Int, i2: Int): Seq[Action] = {
+        val as1 = acts(i1)
+        val as2 = acts(i2)
+        acts.updated(i1, as2).updated(i2, as1)
+      }
+
       def apply(actss: Seq[Seq[Action]]): Seq[Seq[Action]] = {
-        actss.map { acts =>
-          if (Random.nextDouble() < 0.05)
-            acts.updated(Random.nextInt(acts.size), jobActions(Random.nextInt(jobActions.size)))
-          else
-            acts
+        actss.head +: actss.map { acts =>
+          Random.nextDouble() match {
+            case n if n < 0.05 => acts.updated(Random.nextInt(acts.size), jobActions(Random.nextInt(jobActions.size)))
+            case n if n < 0.07 => {
+              val i = Random.nextInt(acts.size - 1)
+              swap(acts, i, 1 + 1)
+            }
+            case n if n < 0.09 => {
+              swap(acts, Random.nextInt(acts.size), Random.nextInt(acts.size))
+            }
+            case _ => acts
+          }
         }
       }
     }
@@ -89,11 +103,20 @@ case class GA(initialization: Initialization, evaluation: Evaluation, selection:
     val eval: Seq[Seq[Action]] => Seq[(Int, Seq[Action])] = actss =>
       actss.par.map(acts => (evaluation(acts), acts)).seq
 
-    val data = Stream.iterate(eval(initialization()))(v => eval(nextGen(v)))
-      .zipWithIndex
-      .takeWhile { case (data, gen) => !termination(gen, data) }
-      .last
-      ._1
+    //リークする
+    //    val data = Stream.iterate(eval(initialization()))(v => eval(nextGen(v)))
+    //      .zipWithIndex
+    //      .takeWhile { case (data, gen) => !termination(gen, data) }
+    //      .last
+    //      ._1
+
+    var data = eval(initialization())
+    var gen = 0
+    while (!termination(gen, data)) {
+      gen += 1
+      data = eval(nextGen(data))
+    }
+
     data.maxBy(_._1)._2
   }
 }

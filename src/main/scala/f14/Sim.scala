@@ -48,7 +48,7 @@ object RandomActionSelector extends ActionSelector {
 case class FixedActionSelector(actions: Seq[Action]) extends ActionSelector {
   def select(context: Context, usableActions: Set[Action]): (Option[Action], ActionSelector) = {
     actions match {
-      case Seq(a, as @ _*) if usableActions.contains(a) => (Some(a), new FixedActionSelector(as))
+      case Seq(a, as @ _*) if usableActions.contains(a) => (Some(a), FixedActionSelector(as))
       case _ => (None, this)
     }
   }

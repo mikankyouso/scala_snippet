@@ -87,3 +87,13 @@ case class Damage(potency: Int, damageType: DamageType, action: Action) extends 
       .removeEnchant(_.deleteBy(this))
   }
 }
+
+object Damage {
+  def calculate(action: Action, potency: Int, damageType: DamageType, context: Context): Damage = {
+    val (percent, absolute) =
+      context.enchants
+        .map(_.correctDamage(damageType, action))
+        .foldLeft((1.0, 0)) { case ((p1, a1), (p2, a2)) => (p1 * (1.0 + p2 / 100.0), a1 + a2) }
+    Damage(((potency + absolute) * percent).toInt, damageType, action)
+  }
+}

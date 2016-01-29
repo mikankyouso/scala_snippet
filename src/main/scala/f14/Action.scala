@@ -25,14 +25,6 @@ trait Action {
       .enqueue(time + freezeTime, FreezeEnd)
   }
 
-  protected def damage(potency: Int, damageType: DamageType, context: Context): Damage = {
-    val (percent, absolute) =
-      context.enchants
-        .map(_.correctDamage(damageType, this))
-        .foldLeft((0, 0)) { case ((p1, a1), (p2, a2)) => (p1 + p2, a1 + a2) }
-    Damage(((potency + absolute) * (1.0 + percent / 100d)).toInt, damageType, this)
-  }
-
   override def toString(): String = this.getClass.getSimpleName
 }
 
@@ -55,17 +47,17 @@ trait Ability extends Action {
 case class DDSpell(level: Int, mp: Int, cast: Int, recast: Int, potency: Int, damageType: DamageType) extends Spell {
   def use(context: Context): Context = {
     val hitTime = context.elapsedTime + 1000.max(cast - 500)
-    useAction(context).enqueue(hitTime, damage(potency, damageType, context))
+    useAction(context).enqueue(hitTime, Damage.calculate(this, potency, damageType, context))
   }
 }
 
 case class DoTSpell(level: Int, mp: Int, cast: Int, recast: Int, duration: Int, hitPotency: Int, tickPotency: Int, damageType: DamageType) extends Spell {
   def use(context: Context): Context = {
-    val dot = DoT(damage(tickPotency, damageType, context), this)
+    val dot = DoT(Damage.calculate(this, tickPotency, damageType, context), this)
     val hitTime = context.elapsedTime + 1000.max(cast - 500)
     useAction(context)
       .ifMap(hitPotency > 0) {
-        _.enqueue(hitTime, damage(hitPotency, damageType, context))
+        _.enqueue(hitTime, Damage.calculate(this, hitPotency, damageType, context))
       }
       .cancelEvent {
         case DeleteEnchant(DoT(_, action)) if action == this => true
@@ -139,7 +131,7 @@ object Burst extends Ability {
       act == Bio || act == Miasma || act == Bio2
     }
     useAction(context)
-      .enqueue(context.elapsedTime + 1000, damage(dots * 100000, Magic, context))
+      .enqueue(context.elapsedTime + 1000, Damage.calculate(this, dots * 100000, Magic, context))
       .enqueue(context.elapsedTime, DeleteEnchant(flow))
       .ifMap(flow.count >= 2) { _.enqueue(context.elapsedTime, AddEnchant(flow.copy(count = flow.count - 1))) }
   }
@@ -156,7 +148,7 @@ object PainFlare extends Ability {
   def use(context: Context): Context = {
     val flow = context.enchants.find(_.action == Flow).get.asInstanceOf[Flow.FlowEnchant]
     useAction(context)
-      .enqueue(context.elapsedTime + 1000, damage(200000, Magic, context))
+      .enqueue(context.elapsedTime + 1000, Damage.calculate(this, 200000, Magic, context))
       .enqueue(context.elapsedTime, DeleteEnchant(flow))
       .ifMap(flow.count >= 2) { _.enqueue(context.elapsedTime, AddEnchant(flow.copy(count = flow.count - 1))) }
   }
