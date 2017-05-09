@@ -46,7 +46,7 @@ case class Context(
   final def forward: Context = {
     val (time, event, queue) = eventQueue.dequeue
     val nextContext = copy(elapsedTime = time, eventQueue = queue)
-    //println("%8.2f %10.2f %s".format(time / 1000.0, damage / 1000.0, event))
+    println("%8.2f %10.2f %s".format(time / 1000.0, damage / 1000.0, event))
     event match {
       case End => nextContext
       case _   => event.apply(nextContext).forward

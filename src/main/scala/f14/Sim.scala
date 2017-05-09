@@ -21,12 +21,15 @@ object Sim {
   def main(args: Array[String]): Unit = {
     val s = System.currentTimeMillis()
     //val as = NopActionSelector
-    val as = RandomActionSelector
+    //    val as = RandomActionSelector
     //    val as = FixedActionSelector(Flow, Mosa, Bio, Miasma, Burst, Ruin2, Ruin2, Ruin2, Ruin2, Ruin2, Ruin2, Ruin2)
+    //    val as = FixedActionSelector(Seq(Bio2, Miasma, Bio, Ruin, Ruin, Ruin, Ruin, Ruin, Ruin, Ruin, Ruin, Ruin, Ruin))
+    val as = FixedActionSelector(Seq(Bio2, Miasma, Bio, Ruin, Ruin, Ruin, Ruin, Ruin, Ruin, Ruin, Bio2, Miasma, Bio))
     //    val as = MaxDamageFinder
-    val ret = (1 to 100000).view.par.map { _ =>
-      Sim(PC(Sum), 30000, as).start
-    }.maxBy(_.damage)
+    //    val ret = (1 to 100000).view.par.map { _ =>
+    //      Sim(PC(Sum), 60000, as).start
+    //    }.maxBy(_.damage)
+    val ret = Sim(PC(Sum), 60000, as).start
     println(ret.damage / 1000, ret.actionHistory.reverse)
     //println(ret)
     println(System.currentTimeMillis() - s + "ms")
@@ -61,8 +64,8 @@ object MaxDamageFinder extends ActionSelector {
       .map { act =>
         (Option(act), act.use(context).forward)
       }
-      //      .+((None, context.forward))
-      //.filter { case (_, c) => c.elapsedTime < 10000 || c.damage / c.elapsedTime > 69 }
+    //      .+((None, context.forward))
+    //.filter { case (_, c) => c.elapsedTime < 10000 || c.damage / c.elapsedTime > 69 }
     if (set.isEmpty) {
       (None, NopActionSelector)
     } else {
