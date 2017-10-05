@@ -1,12 +1,13 @@
+import util.MyImplicits._
+
+import scala.collection.GenTraversableOnce
+
 class Foo {
 
-  val == : _ =:= _ => _ =:= _ = { <= => <= }
-
-  def abc(s: String) = {
-    implicit val i = 345
-    あああ(s)
+  def main(args: Array[String]): Unit = {
+    val x = List(1, 22, 333) |> count
+    println(x)
   }
-  def あああ(str: String)(implicit iii: Int) = str + "hoge" + iii
 
-
+  def count[A <: GenTraversableOnce[_]](t: A): Int = t.size
 }

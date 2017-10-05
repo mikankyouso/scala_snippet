@@ -2,7 +2,7 @@ name := "scala_snippet"
 
 version := "0.0"
 
-scalaVersion := "2.12.2"
+scalaVersion := "2.12.3"
 
 autoCompilerPlugins := true
 
@@ -18,9 +18,9 @@ libraryDependencies ++= Seq(
   //"org.apache.solr" % "solr-core" % "4.4.0" excludeAll(ExclusionRule(organization = "org.restlet.jee")),
   //"org.jruby" % "jruby" % "1.7.4",
   //"org.codehaus.groovy" % "groovy-jsr223" % "2.1.6",
-  "com.itextpdf" % "itextpdf" % "5.4.3",
-  "com.itextpdf" % "itext-asian" % "5.2.0",
-  "org.scalaz" %% "scalaz-core" % "7.2.12",
+  //"com.itextpdf" % "itextpdf" % "5.4.3",
+  //"com.itextpdf" % "itext-asian" % "5.2.0",
+  "org.scalaz" %% "scalaz-core" % "7.2.15",
   //"net.databinder.dispatch" %% "dispatch-core" % "0.11.2",
   //"com.github.scala-incubator.io" %% "scala-io-core" % "0.4.3",
   //"com.github.scala-incubator.io" %% "scala-io-file" % "0.4.3",

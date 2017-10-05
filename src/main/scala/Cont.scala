@@ -2,7 +2,7 @@
 import scala.util.continuations._
 
 object Cont {
-
+/*
   def loopBreak() {
     var i = 0
     reset {
@@ -73,5 +73,5 @@ object Cont {
       println(("abcd" zip List(a, b, c, d)).toList.sortWith(_._2 < _._2))
     }
   }
-
+*/
 }

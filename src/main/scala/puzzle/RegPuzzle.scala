@@ -124,7 +124,7 @@ object RegPuzzle {
     //hex.lines(NEtoSW).foreach(println)
     //    hex.lines(SEtoNW).foreach(println)
 
-    import util.Random
+    import scala.util.Random
     val num = 100
     val result = GA[Hex, Int, Hex](
       new Initialization[Hex] {
