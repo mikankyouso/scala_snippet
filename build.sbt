@@ -1,8 +1,9 @@
+/*
 name := "scala_snippet"
 
 version := "0.0"
 
-scalaVersion := "2.12.3"
+scalaVersion := "2.12.6"
 
 autoCompilerPlugins := true
 
@@ -20,7 +21,7 @@ libraryDependencies ++= Seq(
   //"org.codehaus.groovy" % "groovy-jsr223" % "2.1.6",
   //"com.itextpdf" % "itextpdf" % "5.4.3",
   //"com.itextpdf" % "itext-asian" % "5.2.0",
-  "org.scalaz" %% "scalaz-core" % "7.2.15",
+  "org.scalaz" %% "scalaz-core" % "7.2.24",
   //"net.databinder.dispatch" %% "dispatch-core" % "0.11.2",
   //"com.github.scala-incubator.io" %% "scala-io-core" % "0.4.3",
   //"com.github.scala-incubator.io" %% "scala-io-file" % "0.4.3",
@@ -29,7 +30,7 @@ libraryDependencies ++= Seq(
   "ch.qos.logback" % "logback-classic" % "1.1.3",
   //"org.specs2" %% "specs2" % "3.2" % "test",
   //"org.pegdown" % "pegdown" % "1.4.1" % "test",
-  "com.github.nscala-time" %% "nscala-time" % "2.16.0",
+  "com.github.nscala-time" %% "nscala-time" % "2.20.0",
   "junit" % "junit" % "4.12" % "test",
   "org.scala-lang.modules" %% "scala-xml" % "1.0.6",
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.5",
@@ -44,3 +45,14 @@ EclipseKeys.withSource := true
 
 (testOptions in Test) += Tests.Argument(TestFrameworks.Specs2, "junitxml", "console", "html")
 
+*/
+
+ThisBuild / scalaVersion := "2.12.6"
+
+lazy val scala_snippet = (project in file("."))
+  .settings(
+    name := "scala_snippet",
+    libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.2.24",
+    libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.5",
+    libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % Test,
+  )
